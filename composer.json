@@ -1,0 +1,20 @@
+{
+    "name": "vandmade/tablelify",
+    "description": "Table-ifying service that allowes for easy use and creation of tables within the Laravel framework",
+    "type": "library",
+    "license": "Apache License",
+    "autoload": {
+        "psr-4": {
+            "VanDmade\\Tablelify\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Michael D. VanDerwerker"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.0.1",
+        "illuminate/support": "^11.3"
+    }
+}

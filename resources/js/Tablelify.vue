@@ -2,15 +2,7 @@
     <div class="tablelify-page">
         <div class="row">
             <div class="col col-md-8 col-12">
-                <div :class="{ 'd-grid mb-4': breakpoint('sm') }">
-                    <button type="button"
-                        v-if="creatable"
-                        @click="id = null; item = null"
-                        class="btn btn-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#tablelify-form-modal"
-                        :disabled="disabled">Create</button>
-                </div>
+                <slot name="header"></slot>
             </div>
             <div class="col col-md-4 col-12">
                 <vm-input placeholder="Search" v-model="search" type="input" id="search" :disabled="disabled"/>
@@ -39,18 +31,6 @@
                 <tr v-for="(row, rowIndex) in data" :key="'row-'+rowIndex" class="tablelify-row">
                     <td v-for="(item, index) in headersList" :key="'item-'+index" class="tablelify-column" :class="{ 'pa-0': item.value == 'image' }">
                         <label class="tablelify-header-text">{{ item.name }}</label>
-                        <span v-if="item.value == 'actions'" class="tablelify-actions text-center">
-                            <i v-if="item.edit"
-                                @click="setupEdit(row)"
-                                class="fa-solid fa-pencil tablelify-action-icon tablelify-edit"
-                                data-bs-toggle="modal"
-                                data-bs-target="#tablelify-form-modal"></i>
-                            <i v-if="item.delete"
-                                @click="setupDelete(row.id)"
-                                class="fa-solid fa-trash tablelify-action-icon tablelify-delete"
-                                data-bs-toggle="modal"
-                                data-bs-target="#tablelify-delete-modal"></i>
-                        </span>
                         <slot v-bind="row" :name="item.value"><div class="tablelify-data">{{ typeof(row[item.value]) !== 'undefined' && row[item.value] != null ? (row[item.value] + '') : '' }}</div></slot>
                     </td>
                 </tr>
@@ -80,37 +60,6 @@
                     class="btn btn-secondary tablelify-button tablelify-pagination-button"><i class="fa-solid fa-arrow-right"></i></button>
             </div>
         </div>
-        <div class="modal fade" id="tablelify-form-modal" tabindex="-1" aria-hidden="true">
-            <button type="button" v-show="false" id="close-tablelify-form-modal" data-bs-dismiss="modal"></button>
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <component :is="form" :id="id" :item="item"></component>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="tablelify-delete-modal" tabindex="-1" aria-hidden="true">
-            <button type="button" v-show="false" id="close-tablelify-delete-modal" data-bs-dismiss="modal"></button>
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <loading v-if="modalLoading" :full="false"></loading>
-                        <div v-else>
-                            <div class="alert"
-                                v-if="modalMessage.text != ''"
-                                :class="{ 'alert-danger': modalMessage.type == 'danger', 'alert-success': modalMessage.type }"
-                                role="alert">{{ modalMessage.text }}</div>
-                            <h4 class="mb-6" :class="{ 'text-center': breakpoint('sm') }">{{ deleteMessage }}</h4>
-                            <div :class="{ 'd-grid': breakpoint('sm') }">
-                                <button type="button" :disabled="modalDisabled" @click="deleteItem()" class="btn btn-danger" :class="{ 'mb-4': breakpoint('sm'), 'mr-4': !breakpoint('sm') }">Delete</button>
-                                <button type="button" :disabled="modalDisabled" class="btn btn-secondary" data-bs-dismiss="modal">Go back</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 <script>
@@ -120,16 +69,8 @@ export default {
             loading: true,
             disabled: true,
             error: null,
-            modalMessage: {
-                type: '',
-                text: '',
-            },
-            modalDisabled: false,
-            modalLoading: false,
             headersList: [],
             data: [],
-            id: null,
-            item: null,
             searchTImeout: null,
             column: this.initialSortColumn,
             direction: this.initialSortDirection,
@@ -146,11 +87,6 @@ export default {
         }
     },
     created: function() {
-        if (this.urls == null || typeof(this.urls.data) == 'undefined') {
-            this.loading = false;
-            this.error = 'The data URL is missing from the component creation! Please contact your developer immediately!';
-            return false;
-        }
         this.query();
     },
     methods: {
@@ -168,7 +104,7 @@ export default {
                 column: this.column,
                 direction: this.direction,
             };
-            axios.get(this.urls.data, { params: query }).then(({ data }) => {
+            axios.get(this.url, { params: query }).then(({ data }) => {
                 this.data = data.data;
                 this.page = data.page;
                 this.totalPages = data.total_pages;
@@ -210,38 +146,6 @@ export default {
                 this.query();
             }
         },
-        setupEdit: function(item) {
-            this.id = typeof(item.id) != 'undefined' ? item.id : null;
-            this.item = item;
-        },
-        setupDelete: function(id) {
-            this.modalMessage = { type: '', text: '' };
-            this.id = id;
-        },
-        deleteItem: function() {
-            var closeModal = document.getElementById('close-tablelify-delete-modal');
-            this.modalMessage = { type: '', text: '' };
-            if (this.id == null) {
-                this.modalMessage = { type: 'danger', text: 'Something has occurred, this item could not be deleted.' };
-                return false;
-            }
-            this.modalDisabled = true;
-            return axios.delete(this.urls.delete + this.id).then(({ data }) => {
-                this.modalMessage = { type: 'success', text: data.message };
-                this.query();
-                setTimeout(() => {
-                    closeModal.click();
-                }, 2450);
-            }).catch(({ response }) => {
-                if (response.data.message) {
-                    this.modalMessage = { type: 'danger', text: response.data.message };
-                }
-            }).finally(() => {
-                setTimeout(() => {
-                    this.modalDisabled = false;
-                }, 2500);
-            });
-        }
     },
     watch: {
         headers: {
@@ -266,13 +170,9 @@ export default {
     },
     props: {
         headers: { type: Array, default: [] },
-        modalSize: { type: [Number, String], default: '500px' },
         initialSortColumn: { type: String, default: 'id' },
         initialSortDirection: { type: String, default: 'desc' },
-        creatable: { type: Boolean, default: true },
-        form: { type: String, default: null },
-        urls: { type: [Array, Object], default: null },
-        deleteMessage: { type: String, default: 'Are you sure you want to delete this?' },
+        url: { type: String, required: true },
     }
 }
 </script>

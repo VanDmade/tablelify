@@ -44,18 +44,6 @@
             .tablelify-actions {
                 display: block;
                 width: 100%;
-                .tablelify-action-icon {
-                    margin-left: 4px;
-                    padding: 4px 8px;
-                    cursor: pointer;
-                    color: var(--bs-primary);
-                }
-                .tablelify-action-icon:hover {
-                    color: var(--bs-body-color);
-                }
-                .tablelify-action-icon:first-child {
-                    margin-left: 0;
-                }
             }
             img {
                 height: 42px;
@@ -92,8 +80,12 @@
             }
         }
         .tablelify-header-text {
-            display: block;
+            padding: 0 12px;
+            display: block !important;
             font-size: 12px;
+        }
+        .tablelify-data {
+            padding: 0 12px 8px 12px !important;
         }
     }
 }

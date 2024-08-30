@@ -1,6 +1,7 @@
 <?php
 
 namespace VanDmade\Tablelify;
+use Exception;
 
 class Tablelify
 {
@@ -20,6 +21,10 @@ class Tablelify
     public static function run($query, $parameters, $searchColumns = [])
     {
         $parameters = self::cleanParameters($parameters);
+        try {
+            $table = $query->getModel()->getTable();
+            $query = $query->distinct($table.'.id');
+        } catch (Exception $error) {}
         // Appends the search information and calculates the totals / filtered totals
         list($total, $filtered, $query) = self::create($query, $parameters, $searchColumns);
         // Sorts the results

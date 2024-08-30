@@ -21,7 +21,7 @@ class Tablelify
     {
         $parameters = self::cleanParameters($parameters);
         // Appends the search information and calculates the totals / filtered totals
-        list($total, $filtered, $query) = self::create($query, $parameters['search'], $searchColumns);
+        list($total, $filtered, $query) = self::create($query, $parameters, $searchColumns);
         // Sorts the results
         $query = self::sort($query, $parameters['columns'] ?? $parameters['column'], $parameters['direction']);
         // Executes the query and limits the information based on the limit/offset
@@ -41,14 +41,15 @@ class Tablelify
      * Counts and filters the query results
      * 
      * @param object $query Eloquent query object
-     * @param string $search Search string that filtered the results
+     * @param string $parameters List of variables used to generate / parse the data
      * @param array $searchColumns List of database columns that are to be searched
      * 
      * @return array The total and filtered total of data within the database.
      *   This array also contains the eloquent query object.
     \**************************************************************************/
-    public static function create($query, $search, $searchColumns = [])
+    public static function create($query, $parameters, $searchColumns = [])
     {
+        $search = $parameters['search'] ?? '';
         // Total rows prior to the search value being used
         $total = $query->count();
         $query = $query->where(function($query) use ($search, $searchColumns) {
@@ -62,6 +63,9 @@ class Tablelify
             });
         // Total rows after the search value is sued
         $filteredTotal = $query->count();
+        if (isset($parameters['additional']['group_by'])) {
+            $query = $query->groupBy($parameters['additional']['group_by']);
+        }
         /* Sets up the query and returns the query for the user to run additional
          * functionality on it, or execute it themselves */
         return [$total, $filteredTotal, $query];
@@ -151,7 +155,7 @@ class Tablelify
         /* Calculates the total pages based on the filtered or unfiltered data.
          * IF the size is set to all, the total pages will be set to 1 */
         $totalResults = !is_null($search) ? $filteredTotal : $total;
-        $totalPages = $size == 'all' ? 1 : ceil($total ?? $totalEntriesReturned / $size);
+        $totalPages = $size == 'all' ? 1 : ceil(($totalResults ?? $totalEntriesReturned) / $size);
         // Takes the results and returns the values in the package's default output
         $response = [
             'page' => $page,
@@ -162,7 +166,7 @@ class Tablelify
         ];
         if (config('tablelify.page_details', true)) {
             $response = array_merge($response, [
-                'next_page' => $totalPages == $page ? null : ($page + 1),
+                'next_page' => $totalPages <= $page ? null : ($page + 1),
                 'previous_page' => $page == 1 ? null : ($page - 1),
             ]);
         }

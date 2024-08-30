@@ -5,6 +5,9 @@
         .tablelify-sorter {
             display: none;
         }
+        .tablelify-header-text {
+            display: inline-block;
+        }
     }
     .tablelify-header.tablelify-sortable {
         .tablelify-sorter {
@@ -35,20 +38,16 @@
         .tablelify-column {
             min-height: 42px;
             padding: 0;
-            .tablelify-data {
-                padding: 8px 12px;
-            }
-            .tablelify-header-text {
-                display: none;
-            }
-            .tablelify-actions {
-                display: block;
-                width: 100%;
-            }
             img {
                 height: 42px;
             }
         }
+    }
+    .tablelify-data {
+        padding: 8px 12px;
+    }
+    .tablelify-header-text {
+        display: none;
     }
 }
 .tablelify-pagination {
@@ -81,11 +80,11 @@
         }
         .tablelify-header-text {
             padding: 0 12px;
-            display: block !important;
+            display: block;
             font-size: 12px;
         }
         .tablelify-data {
-            padding: 0 12px 8px 12px !important;
+            padding: 0 12px 8px 12px;
         }
     }
 }

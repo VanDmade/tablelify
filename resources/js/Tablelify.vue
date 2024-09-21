@@ -1,11 +1,14 @@
 <template>
     <div class="tablelify-page">
-        <div class="row">
+        <div class="row mb-4">
             <div class="col col-md-8 col-12">
                 <slot name="header"></slot>
             </div>
             <div class="col col-md-4 col-12">
-                <vm-input placeholder="Search" v-model="search" type="input" id="search" :disabled="disabled"/>
+                <div class="input-group">
+                    <vm-input label="Search" v-model="search" type="input" id="search" :disabled="disabled" hide-details/>
+                    <button type="button" class="btn btn-secondary" @click="query">Refresh</button>
+                </div>
             </div>
         </div>
         <table class="table table-striped table-bordered tablelify" cellpadding="0" cellspacing="0">

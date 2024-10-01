@@ -1,7 +1,7 @@
 {
     "name": "vandmade/tablelify",
     "description": "Table-ifying service that allowes for easy use and creation of tables within the Laravel framework",
-    "type": "library",
+    "type": "package",
     "license": "Apache License",
     "autoload": {
         "psr-4": {
@@ -10,7 +10,8 @@
     },
     "authors": [
         {
-            "name": "Michael D. VanDerwerker"
+            "name": "Michael VanDerwerker",
+            "email": "michaelvanderwerkerllc@gmail.com"
         }
     ],
     "require": {

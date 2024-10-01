@@ -137,6 +137,8 @@ export default {
             this.query();
         },
         showButton: function(number) {
+            this.page = parseInt(this.page);
+            number = parseInt(number);
             var totalAround = this.breakpoint('sm') ? 1 : 2;
             return this.totalPages <= 5 || number == 1 || number == this.totalPages ||
                 (number <= (this.page + totalAround + (this.page == 1 ? 2 : (this.page == 2 ? 1 : 0))) &&

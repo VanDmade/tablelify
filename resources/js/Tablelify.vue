@@ -6,7 +6,7 @@
             </div>
             <div class="col col-md-4 col-12">
                 <div class="input-group">
-                    <vm-input label="Search" v-model="search" type="input" id="search" :disabled="disabled" hide-details/>
+                    <ee-input label="Search" v-model="search" type="input" id="search" :disabled="disabled" hide-details/>
                     <button type="button" class="btn btn-secondary" @click="query">Refresh</button>
                 </div>
             </div>
@@ -41,7 +41,7 @@
         </table>
         <div class="row tablelify-pagination">
             <div class="col col-md-2 col-12">
-                <vm-select v-model="size" :disabled="disabled" :items="countOptions" @change="query" />
+                <ee-select v-model="size" :disabled="disabled" :items="countOptions" @change="query" />
             </div>
             <div v-if="totalPages > 0" class="col col-md-9 offset-md-1 col-12" :class="{ 'text-right': !breakpoint('sm'), 'text-center': breakpoint('sm') }">
                 <button type="button"
@@ -112,7 +112,7 @@ export default {
                 this.page = data.page;
                 this.totalPages = data.total_pages;
             }).catch((error) => {
-                this.error = true;
+                this.error = error.response.data.message ?? error;
             }).finally(() => {
                 this.loading = false;
                 this.disabled = false;
